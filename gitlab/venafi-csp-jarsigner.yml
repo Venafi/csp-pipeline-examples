@@ -1,0 +1,20 @@
+stages:
+  - sign_jar
+
+sign_jarsigner:
+  stage: sign_jar
+  tags:
+    - linux
+  image: quay.io/fullstaq-venafi-gitlab-integration/codesigning-jarsigner:latest-x86_64
+  script:
+    - venafi-sign-jarsigner
+  variables:
+    TPP_AUTH_URL: https://$TPP_URL/vedauth
+    TPP_HSM_URL: https://$TPP_URL/vedhsm
+    TPP_USERNAME: $TPP_USERNAME
+    TPP_PASSWORD: $TPP_PASSWORD
+    INPUT_GLOB: "*.jar"
+    CERTIFICATE_LABEL: Production-Certificate
+  artifacts:
+    paths:
+      - "*.jar"

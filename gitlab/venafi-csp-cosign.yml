@@ -1,0 +1,18 @@
+stages:
+  - docker
+
+sign_image_linux:
+  stage: docker
+  image: docker.io/venafi/code-signing:latest-linux
+  tags:
+    - linux
+  script:
+    - docker login ghcr.io -u "$GHCR_USER" -p "$GHCR_TOKEN"
+    - venafi-sign-cosign
+  variables:
+    TPP_AUTH_URL: https://$TPP_URL/vedauth/
+    TPP_HSM_URL: https://$TPP_URL/vedhsm
+    TPP_USERNAME: $TPP_USERNAME
+    TPP_PASSWORD: $TPP_PASSWORD
+    IMAGE: ghcr.io/myorg/sample-image@sha256:521311a0923441ac832704e7b9fe4daa0a04685a01c9cf54ff3382fd1cde9411
+    CERTIFICATE_LABEL: Container-Signing-Production

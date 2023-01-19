@@ -1,0 +1,67 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: venafi-jarsigner-
+  labels:
+    workflows.argoproj.io/archive-strategy: "false"
+  annotations:
+    workflows.argoproj.io/description: |
+      This is a Venafi jarsigner pipeline
+spec:
+  entrypoint: venafi-jarsigner-example
+  templates:
+  - name: venafi-jarsigner-example
+    steps:
+    - - name: generate-artifact
+        template: buildjar
+    - - name: consume-artifact
+        template: venafi-jarsigner
+        arguments:
+          artifacts:
+          - name: my-test-jar
+            from: "{{steps.generate-artifact.outputs.artifacts.my-jar}}"
+  - name: buildjar
+    container: 
+      image: atlassian/default-image:3
+      command: [sh, -c]
+      args: ["wget https://myrepo/test.jar -O /root/test.jar"]
+    outputs:
+      artifacts:
+      - name: my-jar
+        path: /root/test.jar
+        archive:
+          none: {}
+
+  - name: venafi-jarsigner
+    inputs:
+      artifacts:
+      - name: my-test-jar
+        path: /root/test.jar
+    script:
+      env:
+        - name: TPP_AUTH_URL
+          value: "https://tpp.example.com/vedauth"
+        - name: TPP_HSM_URL
+          value: "https://tpp.example.com/vedhsm"
+        - name: TPP_USERNAME
+          value: sample-cs-user
+        - name: TPP_PASSWORD
+          value: SecretPassw0rd
+        - name: CERTIFICATE_LABEL
+          value: Sample-Development-Environment
+        - name: INPUT_PATH
+          value: /root/test.jar
+      image: zosocanuck/venafi-csp-ubuntu:latest
+      command: [bash]
+      source: |
+        apt-get update
+        apt-get install --no-install-recommends -y openjdk-8-jdk-headless
+        wget --user=poc --password=Passw0rd123! https://myrepo/venafipkcs11.txt -O /root/venafipkcs11.conf
+        wget --user=poc --password=Passw0rd123! https://myrepo/poc_guide/test.jar -O /root/test.jar
+        echo "Configure Venafi CSP client"
+        pkcs11config trust -hsmurl $TPP_HSM_URL -force
+        pkcs11config seturl -authurl $TPP_AUTH_URL -hsmurl $TPP_HSM_URL
+        pkcs11config getgrant --authurl=$TPP_AUTH_URL --hsmurl=$TPP_HSM_URL --username=$TPP_USERNAME --password=$TPP_PASSWORD --force
+        echo "Sign and Verify Using JarSigner"
+        jarsigner $INPUT_PATH $CERTIFICATE_LABEL -storepass bogus -storetype PKCS11 -keystore NONE -providerclass sun.security.pkcs11.SunPKCS11 -providerArg /root/venafipkcs11.conf
+        jarsigner -verify -keystore NONE -storetype PKCS11 -storepass bogus -providerclass sun.security.pkcs11.SunPKCS11 -providerArg /root/venafipkcs11.conf $INPUT_PATH

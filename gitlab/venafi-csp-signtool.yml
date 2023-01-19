@@ -1,0 +1,26 @@
+stages:
+  - sign
+
+sign_windows:
+  stage: sign
+  image: docker.io/venafi/code-signing:latest-windows
+  tags:
+    - windows
+  script:
+    - venafi-sign-signtool
+    - Copy-Item -Path '.\bin\windows_amd64' -Destination '.\final_bin\windows_amd64' -Recurse
+  variables:
+    TPP_AUTH_URL: https://$TPP_URL/vedauth/
+    TPP_HSM_URL: https://$TPP_URL/vedhsm
+    TPP_USERNAME: $TPP_USERNAME
+    TPP_PASSWORD: $TPP_PASSWORD
+    INPUT_PATH: bin/windows_amd64/*
+    CERTIFICATE_SUBJECT_NAME: Acme, Inc.
+    CERTIFICATE_LABEL: Production-Certificate
+    TIMESTAMPING_SERVERS: http://timestamp.digicert.com
+  artifacts:
+    paths:
+      - final_bin/windows_amd64/
+  rules:
+    - if: $PIPELINE_TESTING == "1" || $CI_COMMIT_REF_NAME == "main"
+      when: always

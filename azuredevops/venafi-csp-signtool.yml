@@ -1,0 +1,23 @@
+trigger:
+- master
+
+pool:
+  name: sidechain 
+
+steps:
+- task: PowerShell@2
+  displayName: Download file to sign
+  inputs:
+    targetType: 'inline'
+    script: | 
+      Invoke-WebRequest -Uri https://the.earth.li/~sgtatham/putty/latest/w64/putty.exe -OutFile C:\Temp\test.exe
+
+- task: venafi-signing-task@0
+  inputs:
+    signer: 'signtool'
+    authurl: 'https://$(TPP_URL)/vedauth'
+    hsmurl: 'https://$(TPP_URL)/vedhsm'
+    username: $(USERNAME)
+    password: $(PASSWORD)
+    filesPath: 'C:\Temp\'
+    subjectName: 'prod-cert.myorg.com'
