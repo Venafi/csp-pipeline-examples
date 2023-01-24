@@ -1,0 +1,3 @@
+name = VenafiPKCS11
+library ="/opt/venafi/codesign/lib/venafipkcs11.so"
+slot = 0

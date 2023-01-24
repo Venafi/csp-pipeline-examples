@@ -1,0 +1,22 @@
+# This is an example pipeline showing how to securely automate the code signing process
+# for Java applications using Venafi CodeSign Protect
+# Ensure the necessary Pipeline Repository Variables are set based on this example
+
+image: zosocanuck/venafi-csp-ubuntu:latest
+
+pipelines:
+  default:
+    - step:
+        name: 'Venafi CSP JarSigner Demo'
+        script:
+          - echo "Download and Install pre-requisites"
+          - apt-get update
+          - apt-get install --no-install-recommends -y openjdk-8-jdk-headless
+          - wget https://myrepo/venafipkcs11.txt -O /root/venafipkcs11.conf
+          - wget https://myrepo/test.jar -O /root/test.jar
+          - /opt/venafi/codesign/bin/pkcs11config trust -hsmurl $VENAFITPPURL/vedhsm -force
+          - /opt/venafi/codesign/bin/pkcs11config seturl -authurl $VENAFITPPURL/vedauth -hsmurl $VENAFITPPURL/vedhsm
+          - /opt/venafi/codesign/bin/pkcs11config getgrant --authurl=$VENAFITPPURL/vedauth --hsmurl=$VENAFITPPURL/vedhsm --username=$CSPUSER --password=$CSPPASSWORD --force
+          - echo "Sign and Verify Using JarSigner"
+          - jarsigner /root/test.jar Sample-Development-Environment -storepass bogus -storetype PKCS11 -keystore NONE -providerclass sun.security.pkcs11.SunPKCS11 -providerArg /root/venafipkcs11.conf
+          - jarsigner -verify -keystore NONE -storetype PKCS11 -storepass bogus -providerclass sun.security.pkcs11.SunPKCS11 -providerArg /root/venafipkcs11.conf /root/test.jar
