@@ -5,6 +5,9 @@ Curated list of example CI/CD pipelines for use with [Venafi CodeSign Protect](h
 ## Index
 
 * [Jenkins](jenkins) 
+  * [Maven jarsigner plugin](jenkins/venafi-csp-maven-jarsigner/)
+  * [Maven Ant SignJar plugin](jenkins/venafi-csp-ant-signjar/)
 * [Gitlab](gitlab) 
 * [ArgoCD](argocd) 
 * [Azure DevOps](azuredevops)
+* [Bitbucket](bitbucket)
