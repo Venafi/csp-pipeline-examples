@@ -1,0 +1,41 @@
+plugins {
+	id 'java-library'
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+apply plugin: 'maven-publish'
+
+mainClassName = 'com.powple.demo.DemoApplication'
+
+group = 'com.powple'
+version = '0.0.2-SNAPSHOT'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+}
+
+jar {
+	archiveBaseName = 'demoapp'
+	archiveVersion = '0.1.0'
+}
+
+tasks.register('sign') {
+    doLast {
+		ant.signjar(jar: "${buildDir}/libs/demoapp-0.1.0.jar", alias: 'vsign-rsa2048-cert', storetype: 'PKCS11', storepass: 'NONE', providerclass: 'sun.security.pkcs11.SunPKCS11', providerarg: '/root/venafipkcs11.txt')
+    }
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+			artifactId 'demo'
+		}
+	}
+}
+
+build.dependsOn jar
