@@ -1,0 +1,31 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Installing pre-requisites
+      - apt-get update
+      - apt-get install --no-install-recommends -y wget libpcsclite-dev ca-certificates
+      - echo Download and install Venafi CSP client for Ubuntu
+      - wget https://$TPP_URL/csc/clients/venafi-csc-latest-x86_64.deb
+      - dpkg -i venafi-csc-latest-x86_64.deb
+      - echo Download and install sigstore/cosign
+      - wget https://github.com/sigstore/cosign/releases/download/v1.13.1/cosign-linux-pivkey-pkcs11key-amd64 -O cosign
+      - chmod +x cosign
+      - mv cosign /usr/bin/cosign
+      - echo Logging in to Docker Hub...
+      - docker login docker.io -u $DOCKER_USERNAME -p $DOCKER_PAT
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...          
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG docker.io/zosocanuck/$IMAGE_REPO_NAME:$IMAGE_TAG      
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push docker.io/myorg/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - echo CSP authentication
+      - /opt/venafi/codesign/bin/pkcs11config getgrant --force --authurl=https://$TPP_URL/vedauth --hsmurl=https://$TPP_URL/vedhsm --username=$USERNAME --password=$PASSWORD
+      - cosign sign --key "pkcs11:slot-id=0;object=Container-Signing-Production?module-path=/opt/venafi/codesign/lib/venafipkcs11.so&pin-value=1234" docker.io/myorg/$IMAGE_REPO_NAME:$IMAGE_TAG
