@@ -3,23 +3,15 @@ on: workflow_dispatch
 jobs:
   test_vsign_action:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read  
-
-    name: Install Venafi CSP client
     steps:
-      - uses: actions/checkout@master
-        with:
-          fetch-depth: 1
-
       - name: Install Venafi CSP client
         uses: venafi/csp-client-installer@main
         with:
             tpp-url: ${{ secrets.TPP_URL }}
-
       - name: Install Java
-      - uses: actions/setup-java@v3
+        uses: actions/setup-java@v3
         with:
             java-version: '11'
       - name: Download resources
