@@ -1,0 +1,32 @@
+on: workflow_dispatch
+
+jobs:
+  test_vsign_action:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read  
+
+    name: Install Venafi CSP client
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 1
+
+      - name: Install Venafi CSP client
+        uses: venafi/csp-client-installer@main
+        with:
+            tpp-url: ${{ secrets.TPP_URL }}
+
+      - name: Install Java
+      - uses: actions/setup-java@v3
+        with:
+            java-version: '11'
+      - name: Download resources
+        run: |
+          wget -nv --user=poc --password=Passw0rd123! ${{ secrets.TPP_URL }}/poc_guide/test.apk -O ~/test.apk
+          wget --user=poc --password=Passw0rd123! ${{ secrets.TPP_URL }}/poc_guide/venafipkcs11.txt -O ~/venafipkcs11.txt
+
+      - name: Sign JAR file
+        run: |
+          jarsigner -verbose -keystore NONE -storetype PKCS11 -storepass none -providerclass sun.security.pkcs11.SunPKCS11 -providerArg ~/venafipkcs11.txt -certs -tsa http://timestamp.digicert.com ~/test.apk vsign-rsa2048-cert'
