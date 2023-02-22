@@ -1,7 +1,7 @@
 on: workflow_dispatch
 
 jobs:
-  test_vsign_action:
+  test_csp_client_installer_action:
     runs-on: ubuntu-latest
     permissions:
       contents: read  
