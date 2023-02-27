@@ -1,0 +1,18 @@
+stages:          # List of stages for jobs, and their order of execution
+  - build_sign
+  - sign_standalone
+
+build-job:  # Build and Sign
+  stage: build_sign
+  script:
+    - tkdriverconfig getgrant --hsmurl=${TPP_URL}/vedhsm --authurl=${TPP_URL}/vedauth --username=${TPP_USERNAME} --password=${TPP_PASSWORD}
+    - xcodebuild clean -project SampleIOSApp.xcodeproj -scheme SampleIOSApp archive -configuration Release -archivePath archives/
+  artifacts:
+    paths:
+      - archives.xcarchive/
+ 
+codesign-job:  # Sign application using codesign standalone utility
+  stage: sign_standalone
+  script: 
+    - |
+      codesign --force -o runtime --sign "${SIGNING_CERTIFICATE}" archives.xcarchive/Products/Applications/SampleIOSApp.app
