@@ -5,7 +5,7 @@ sign_jarsigner:
   stage: sign_jar
   tags:
     - linux
-  image: quay.io/fullstaq-venafi-gitlab-integration/codesigning-jarsigner:latest-x86_64
+  image: quay.io/venafi-gitlab-integration/codesigning-jarsigner:latest-x86_64
   script:
     - venafi-sign-jarsigner
   variables:
