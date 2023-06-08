@@ -1,6 +1,7 @@
 stages:          # List of stages for jobs, and their order of execution
   - build_sign
   - sign_standalone
+  - build_sign_package
 
 build-job:  # Build and Sign
   stage: build_sign
@@ -16,3 +17,10 @@ codesign-job:  # Sign application using codesign standalone utility
   script: 
     - |
       codesign --force -o runtime --sign "${SIGNING_CERTIFICATE}" archives.xcarchive/Products/Applications/SampleIOSApp.app
+
+build-sign-package-job:
+  stage: build_sign_package
+  script:
+    - |
+      productbuild --component archives.xcarchive/Products/Applications/SampleIOSApp.app sampleiosapp.pkg
+      productsign --sign "${PACKAGE_SIGNER_CERTIFICATE}" sampleiosapp.pkg sampleiosapp-signed.pkg  
