@@ -1,0 +1,21 @@
+# This is an example pipeline showing how to securely automate the code signing process for Windows
+# applications using Venafi CodeSign Protect.
+#
+# Ensure the necessary Pipeline Repository variables are set based on this example
+# 
+# Also note that this example relies on a self-hosted windows runner with the Venafi CodeSign Protect client
+# already installed as wells the Windows SDK (which includes signtool)
+
+pipelines:
+  default:
+    - step:
+        name: 'Sign with signtool'
+        runs-on:
+          - 'self.hosted'
+          - 'windows'
+        script:
+          - |
+            cspconfig getgrant --authurl=$TPP_URL/vedauth --hsmurl=$TPP_URL/vedhsm --username=$TPP_USERNAME --password=$TPP_PASSWORD --force
+            cspconfig sync
+            cspconfig list
+            signtool sign /v /fd sha256 /n signer.example.com /td sha256 /tr http://timestamp.digicert.com c:\temp\sample.exe
