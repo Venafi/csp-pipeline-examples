@@ -16,7 +16,9 @@ pipelines:
           - wget https://myrepo/test.jar -O /root/test.jar
           - /opt/venafi/codesign/bin/pkcs11config trust -hsmurl $VENAFITPPURL/vedhsm -force
           - /opt/venafi/codesign/bin/pkcs11config seturl -authurl $VENAFITPPURL/vedauth -hsmurl $VENAFITPPURL/vedhsm
+          - set +x
           - /opt/venafi/codesign/bin/pkcs11config getgrant --authurl=$VENAFITPPURL/vedauth --hsmurl=$VENAFITPPURL/vedhsm --username=$CSPUSER --password=$CSPPASSWORD --force
+          - set -x
           - echo "Sign and Verify Using JarSigner"
           - jarsigner /root/test.jar Sample-Development-Environment -storepass bogus -storetype PKCS11 -keystore NONE -providerclass sun.security.pkcs11.SunPKCS11 -providerArg /root/venafipkcs11.conf
           - jarsigner -verify -keystore NONE -storetype PKCS11 -storepass bogus -providerclass sun.security.pkcs11.SunPKCS11 -providerArg /root/venafipkcs11.conf /root/test.jar
