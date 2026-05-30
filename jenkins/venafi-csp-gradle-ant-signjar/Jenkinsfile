@@ -18,10 +18,10 @@ pipeline {
                    '''
             }
         }
-        stage('Build') { 
+        stage('Build') {
             steps {
-                sh 'gradle build'
-                sh 'gradle sign' 
+                sh './gradlew build'
+                sh './gradlew sign'
             }
         }
     }
