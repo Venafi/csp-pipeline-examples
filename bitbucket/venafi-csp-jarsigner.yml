@@ -14,7 +14,8 @@ pipelines:
           - apt-get install --no-install-recommends -y openjdk-8-jdk-headless
           - wget https://myrepo/venafipkcs11.txt -O /root/venafipkcs11.conf
           - wget https://myrepo/test.jar -O /root/test.jar
-          - /opt/venafi/codesign/bin/pkcs11config trust -hsmurl $VENAFITPPURL/vedhsm -force
+          - echo "$TPP_CA_PEM" > /tmp/tpp-ca.pem
+          - /opt/venafi/codesign/bin/pkcs11config trust --file /tmp/tpp-ca.pem
           - /opt/venafi/codesign/bin/pkcs11config seturl -authurl $VENAFITPPURL/vedauth -hsmurl $VENAFITPPURL/vedhsm
           - /opt/venafi/codesign/bin/pkcs11config getgrant --authurl=$VENAFITPPURL/vedauth --hsmurl=$VENAFITPPURL/vedhsm --username=$CSPUSER --password=$CSPPASSWORD --force
           - echo "Sign and Verify Using JarSigner"
