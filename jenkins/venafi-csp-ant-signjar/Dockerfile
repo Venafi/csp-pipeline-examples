@@ -3,11 +3,14 @@ FROM alpine:3.5
 #Create Ant Dir
 RUN mkdir -p /opt/ant/
 #Download And 1.9.8
-RUN wget http://archive.apache.org/dist/ant/binaries/apache-ant-1.9.8-bin.tar.gz -P /opt/ant
+RUN wget https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.8-bin.tar.gz -P /opt/ant && \
+    wget https://archive.apache.org/dist/ant/binaries/apache-ant-1.9.8-bin.tar.gz.sha512 -P /opt/ant && \
+    cd /opt/ant && \
+    sha512sum -c apache-ant-1.9.8-bin.tar.gz.sha512
 #Unpack Ant
 RUN tar -xvzf /opt/ant/apache-ant-1.9.8-bin.tar.gz -C /opt/ant/
 # Remove tar file
-RUN rm -f /opt/ant/apache-ant-1.9.8-bin.tar.gz
+RUN rm -f /opt/ant/apache-ant-1.9.8-bin.tar.gz /opt/ant/apache-ant-1.9.8-bin.tar.gz.sha512
 #Drop Sonarqube lib
 RUN wget http://downloads.sonarsource.com/plugins/org/codehaus/sonar-plugins/sonar-ant-task/2.3/sonar-ant-task-2.3.jar -P /opt/ant/apache-ant-1.9.8/lib/
 #Install JDK 1.8
