@@ -28,4 +28,4 @@ phases:
       - docker push docker.io/myorg/$IMAGE_REPO_NAME:$IMAGE_TAG
       - echo CSP authentication
       - /opt/venafi/codesign/bin/pkcs11config getgrant --force --authurl=https://$TPP_URL/vedauth --hsmurl=https://$TPP_URL/vedhsm --username=$USERNAME --password=$PASSWORD
-      - cosign sign --key "pkcs11:slot-id=0;object=Container-Signing-Production?module-path=/opt/venafi/codesign/lib/venafipkcs11.so&pin-value=1234" docker.io/myorg/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - cosign sign --key "pkcs11:slot-id=0;object=Container-Signing-Production?module-path=/opt/venafi/codesign/lib/venafipkcs11.so&pin-value=$PKCS11_PIN" docker.io/myorg/$IMAGE_REPO_NAME:$IMAGE_TAG
