@@ -18,10 +18,17 @@ pipeline {
                    '''
             }
         }
-        stage('Build') { 
+        stage('Verify Gradle Wrapper') {
             steps {
-                sh 'gradle build'
-                sh 'gradle sign' 
+                sh '''#!/bin/bash
+                       echo "ebb6eaf164c425ffe76f9744a324feb774e750d821ed212d4c41f452adea248e  gradle/wrapper/gradle-wrapper.jar" | sha256sum -c -
+                   '''
+            }
+        }
+        stage('Build') {
+            steps {
+                sh './gradlew build'
+                sh './gradlew sign'
             }
         }
     }
