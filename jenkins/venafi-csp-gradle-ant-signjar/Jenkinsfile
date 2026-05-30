@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            image 'gradle:7.5.1-jdk11' 
-            args '-u root -v /root/.m2:/root/.m2' 
+            image 'gradle:7.5.1-jdk11'
+            args '-u root'
         }
     }
     stages {
