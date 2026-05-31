@@ -1,4 +1,4 @@
-FROM alpine:3.5
+FROM alpine:3.5@sha256:f7d2b5725685826823bc6b154c0de02832e5e6daf7dc25a00ab00f1158fabfc8
 
 #Create Ant Dir
 RUN mkdir -p /opt/ant/

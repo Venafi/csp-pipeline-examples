@@ -3,7 +3,7 @@ stages:
 
 sign_image_linux:
   stage: docker
-  image: docker.io/venafi/code-signing:latest-linux
+  image: docker.io/venafi/code-signing:latest-linux@sha256:09dccbaf1940e846f41b72af5c9596827d8d8779aa67307d11182c50467d0b1f
   tags:
     - linux
   script:

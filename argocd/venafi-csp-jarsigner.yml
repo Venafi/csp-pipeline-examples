@@ -21,8 +21,8 @@ spec:
           - name: my-test-jar
             from: "{{steps.generate-artifact.outputs.artifacts.my-jar}}"
   - name: buildjar
-    container: 
-      image: atlassian/default-image:3
+    container:
+      image: atlassian/default-image:3@sha256:496b5b602817d68ea0d0b6a030708cd1017f7cb28d69b74f22dfe26229199f91
       command: [sh, -c]
       args: ["wget https://myrepo/test.jar -O /root/test.jar"]
     outputs:
@@ -51,7 +51,7 @@ spec:
           value: Sample-Development-Environment
         - name: INPUT_PATH
           value: /root/test.jar
-      image: zosocanuck/venafi-csp-ubuntu:latest
+      image: zosocanuck/venafi-csp-ubuntu:latest@sha256:6056b44e34b1ddc29f2ed492ae30d7d8583090e7ceef448518b65e1def6173e3
       command: [bash]
       volumeMounts:
         - name: tpp-ca-cert
