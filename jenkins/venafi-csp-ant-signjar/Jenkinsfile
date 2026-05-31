@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            image 'maven:3.8.1-adoptopenjdk-11' 
-            args '-u root -v /root/.m2:/root/.m2' 
+            image 'maven:3.8.1-adoptopenjdk-11'
+            args '-u root'
         }
     }
     stages {
@@ -11,10 +11,13 @@ pipeline {
                 sh '''#!/bin/bash
                        apt-get update
                        apt-get install --no-install-recommends -y wget ant ca-certificates
-                       wget https://$CSP_DOMAIN/csc/clients/venafi-csc-latest-x86_64.deb
-                       wget https://$CSP_DOMAIN/poc_guide/venafipkcs11.txt -O /root/venafipkcs11.txt
+                       wget --https-only --secure-protocol=TLSv1_2 https://$CSP_DOMAIN/csc/clients/venafi-csc-latest-x86_64.deb
+                       echo "${CSP_CLIENT_SHA256}  venafi-csc-latest-x86_64.deb" | sha256sum -c -
+                       wget --https-only --secure-protocol=TLSv1_2 https://$CSP_DOMAIN/poc_guide/venafipkcs11.txt -O /root/venafipkcs11.txt
                        dpkg -i venafi-csc-latest-x86_64.deb
+                       set +x
                        /opt/venafi/codesign/bin/pkcs11config getgrant --force --authurl=$CSP_AUTH_URL --hsmurl=$CSP_HSM_URL --username=$CSP_USER --password=$CSP_PASSWORD
+                       set -x
                    '''
             }
         }

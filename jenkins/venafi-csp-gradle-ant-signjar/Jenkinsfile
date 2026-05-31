@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            image 'gradle:7.5.1-jdk11' 
-            args '-u root -v /root/.m2:/root/.m2' 
+            image 'gradle:7.5.1-jdk11'
+            args '-u root'
         }
     }
     stages {
@@ -11,17 +11,27 @@ pipeline {
                 sh '''#!/bin/bash
                        apt-get update
                        apt-get install --no-install-recommends -y wget ca-certificates
-                       wget https://$CSP_DOMAIN/csc/clients/venafi-csc-latest-x86_64.deb
-                       wget https://$CSP_DOMAIN/poc_guide/venafipkcs11.txt -O /root/venafipkcs11.txt
+                       wget --https-only --secure-protocol=TLSv1_2 https://$CSP_DOMAIN/csc/clients/venafi-csc-latest-x86_64.deb
+                       echo "${CSP_CLIENT_SHA256}  venafi-csc-latest-x86_64.deb" | sha256sum -c -
+                       wget --https-only --secure-protocol=TLSv1_2 https://$CSP_DOMAIN/poc_guide/venafipkcs11.txt -O /root/venafipkcs11.txt
                        dpkg -i venafi-csc-latest-x86_64.deb
+                       set +x
                        /opt/venafi/codesign/bin/pkcs11config getgrant --force --authurl=$CSP_AUTH_URL --hsmurl=$CSP_HSM_URL --username=$CSP_USER --password=$CSP_PASSWORD
+                       set -x
                    '''
             }
         }
-        stage('Build') { 
+        stage('Verify Gradle Wrapper') {
             steps {
-                sh 'gradle build'
-                sh 'gradle sign' 
+                sh '''#!/bin/bash
+                       echo "ebb6eaf164c425ffe76f9744a324feb774e750d821ed212d4c41f452adea248e  gradle/wrapper/gradle-wrapper.jar" | sha256sum -c -
+                   '''
+            }
+        }
+        stage('Build') {
+            steps {
+                sh './gradlew build'
+                sh './gradlew sign'
             }
         }
     }
