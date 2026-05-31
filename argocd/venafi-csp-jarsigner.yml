@@ -44,9 +44,9 @@ spec:
         - name: TPP_HSM_URL
           value: "https://tpp.example.com/vedhsm"
         - name: TPP_USERNAME
-          value: sample-cs-user
+          value: $TPP_USERNAME
         - name: TPP_PASSWORD
-          value: SecretPassw0rd
+          value: $TPP_PASSWORD
         - name: CERTIFICATE_LABEL
           value: Sample-Development-Environment
         - name: INPUT_PATH
@@ -60,8 +60,8 @@ spec:
       source: |
         apt-get update
         apt-get install --no-install-recommends -y openjdk-8-jdk-headless
-        wget --user=poc --password=Passw0rd123! https://myrepo/venafipkcs11.txt -O /root/venafipkcs11.conf
-        wget --user=poc --password=Passw0rd123! https://myrepo/poc_guide/test.jar -O /root/test.jar
+        wget https://myrepo/venafipkcs11.txt -O /root/venafipkcs11.conf
+        wget https://myrepo/poc_guide/test.jar -O /root/test.jar
         echo "Configure Venafi CSP client"
         pkcs11config trust --file /etc/venafi/ca.pem
         pkcs11config seturl -authurl $TPP_AUTH_URL -hsmurl $TPP_HSM_URL
