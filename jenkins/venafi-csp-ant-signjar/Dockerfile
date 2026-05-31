@@ -8,7 +8,7 @@ RUN wget --https-only --secure-protocol=TLSv1_2 https://archive.apache.org/dist/
 #Unpack Ant
 RUN tar -xvzf /opt/ant/apache-ant-1.9.8-bin.tar.gz -C /opt/ant/
 # Remove tar file
-RUN rm -f /opt/ant/apache-ant-1.9.8-bin.tar.gz
+RUN rm -f /opt/ant/apache-ant-1.9.8-bin.tar.gz /opt/ant/apache-ant-1.9.8-bin.tar.gz.sha512
 #Drop Sonarqube lib
 RUN wget --https-only --secure-protocol=TLSv1_2 https://downloads.sonarsource.com/plugins/org/codehaus/sonar-plugins/sonar-ant-task/2.3/sonar-ant-task-2.3.jar -P /opt/ant/apache-ant-1.9.8/lib/ && \
     echo "c96fd09dfd0ff9907d3467de5fe17b3fb9f3c95a74afaa4021d80b5da436f61e  /opt/ant/apache-ant-1.9.8/lib/sonar-ant-task-2.3.jar" | sha256sum -c -
