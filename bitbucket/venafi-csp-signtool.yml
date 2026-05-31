@@ -15,7 +15,9 @@ pipelines:
           - 'windows'
         script:
           - |
+            set +x
             cspconfig getgrant --authurl=$TPP_URL/vedauth --hsmurl=$TPP_URL/vedhsm --username=$TPP_USERNAME --password=$TPP_PASSWORD --force
+            set -x
             cspconfig sync
             cspconfig list
             signtool sign /v /fd sha256 /n signer.example.com /td sha256 /tr http://timestamp.digicert.com c:\temp\sample.exe

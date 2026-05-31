@@ -20,14 +20,17 @@ sudo apt-get install tree
 sudo apt-get install git-flow
 
 #Jenkins
-wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -
+wget --https-only --secure-protocol=TLSv1_2 -q -O jenkins-ci.org.key https://pkg.jenkins.io/debian/jenkins-ci.org.key
+echo "${JENKINS_KEY_SHA256}  jenkins-ci.org.key" | sha256sum -c -
+sudo apt-key add jenkins-ci.org.key
 sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
 sudo apt-get update
 sudo apt-get install jenkins -y
 
 #Artifactory
 
-wget https://bintray.com/jfrog/artifactory/download_file?file_path=jfrog-artifactory-oss-6.5.2.zip
+wget --https-only --secure-protocol=TLSv1_2 https://bintray.com/jfrog/artifactory/download_file?file_path=jfrog-artifactory-oss-6.5.2.zip
+echo "${ARTIFACTORY_SHA256}  download_file?file_path=jfrog-artifactory-oss-6.5.2.zip" | sha256sum -c -
 # unzip jfrog-artifactory-oss-6.5.2.zip
 unzip download_file?file_path=jfrog-artifactory-oss-6.5.2.zip
 cd art*

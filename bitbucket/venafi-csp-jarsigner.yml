@@ -2,7 +2,7 @@
 # for Java applications using Venafi CodeSign Protect
 # Ensure the necessary Pipeline Repository Variables are set based on this example
 
-image: zosocanuck/venafi-csp-ubuntu:latest
+image: zosocanuck/venafi-csp-ubuntu:latest@sha256:6056b44e34b1ddc29f2ed492ae30d7d8583090e7ceef448518b65e1def6173e3
 
 pipelines:
   default:
@@ -14,9 +14,12 @@ pipelines:
           - apt-get install --no-install-recommends -y openjdk-8-jdk-headless
           - wget https://myrepo/venafipkcs11.txt -O /root/venafipkcs11.conf
           - wget https://myrepo/test.jar -O /root/test.jar
-          - /opt/venafi/codesign/bin/pkcs11config trust -hsmurl $VENAFITPPURL/vedhsm -force
+          - echo "$TPP_CA_PEM" > /tmp/tpp-ca.pem
+          - /opt/venafi/codesign/bin/pkcs11config trust --file /tmp/tpp-ca.pem
           - /opt/venafi/codesign/bin/pkcs11config seturl -authurl $VENAFITPPURL/vedauth -hsmurl $VENAFITPPURL/vedhsm
+          - set +x
           - /opt/venafi/codesign/bin/pkcs11config getgrant --authurl=$VENAFITPPURL/vedauth --hsmurl=$VENAFITPPURL/vedhsm --username=$CSPUSER --password=$CSPPASSWORD --force
+          - set -x
           - echo "Sign and Verify Using JarSigner"
           - jarsigner /root/test.jar Sample-Development-Environment -storepass bogus -storetype PKCS11 -keystore NONE -providerclass sun.security.pkcs11.SunPKCS11 -providerArg /root/venafipkcs11.conf
           - jarsigner -verify -keystore NONE -storetype PKCS11 -storepass bogus -providerclass sun.security.pkcs11.SunPKCS11 -providerArg /root/venafipkcs11.conf /root/test.jar

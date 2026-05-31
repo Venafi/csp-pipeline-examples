@@ -7,10 +7,12 @@ phases:
       - apt-get update
       - apt-get install --no-install-recommends -y wget libpcsclite-dev ca-certificates
       - echo Download and install Venafi CSP client for Ubuntu
-      - wget https://$TPP_URL/csc/clients/venafi-csc-latest-x86_64.deb
+      - wget --https-only --secure-protocol=TLSv1_2 https://$TPP_URL/csc/clients/venafi-csc-latest-x86_64.deb
+      - echo "${CSP_CLIENT_SHA256}  venafi-csc-latest-x86_64.deb" | sha256sum -c -
       - dpkg -i venafi-csc-latest-x86_64.deb
       - echo Download and install sigstore/cosign
-      - wget https://github.com/sigstore/cosign/releases/download/v1.13.1/cosign-linux-pivkey-pkcs11key-amd64 -O cosign
+      - wget --https-only --secure-protocol=TLSv1_2 https://github.com/sigstore/cosign/releases/download/v1.13.1/cosign-linux-pivkey-pkcs11key-amd64 -O cosign
+      - echo "${COSIGN_SHA256}  cosign" | sha256sum -c -
       - chmod +x cosign
       - mv cosign /usr/bin/cosign
       - echo Logging in to Docker Hub...
@@ -27,5 +29,7 @@ phases:
       - echo Pushing the Docker image...
       - docker push docker.io/myorg/$IMAGE_REPO_NAME:$IMAGE_TAG
       - echo CSP authentication
+      - set +x
       - /opt/venafi/codesign/bin/pkcs11config getgrant --force --authurl=https://$TPP_URL/vedauth --hsmurl=https://$TPP_URL/vedhsm --username=$USERNAME --password=$PASSWORD
-      - cosign sign --key "pkcs11:slot-id=0;object=Container-Signing-Production?module-path=/opt/venafi/codesign/lib/venafipkcs11.so&pin-value=$PKCS11_PIN" docker.io/myorg/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - set -x
+      - cosign sign --key "pkcs11:slot-id=0;object=Container-Signing-Production?module-path=/opt/venafi/codesign/lib/venafipkcs11.so&pin-value=1234" docker.io/myorg/$IMAGE_REPO_NAME:$IMAGE_TAG
