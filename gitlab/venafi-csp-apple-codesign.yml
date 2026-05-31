@@ -6,7 +6,9 @@ stages:          # List of stages for jobs, and their order of execution
 build-job:  # Build and Sign
   stage: build_sign
   script:
+    - set +x
     - tkdriverconfig getgrant --hsmurl=${TPP_URL}/vedhsm --authurl=${TPP_URL}/vedauth --username=${TPP_USERNAME} --password=${TPP_PASSWORD}
+    - set -x
     - xcodebuild clean -project SampleIOSApp.xcodeproj -scheme SampleIOSApp archive -configuration Release -archivePath archives/
   artifacts:
     paths:

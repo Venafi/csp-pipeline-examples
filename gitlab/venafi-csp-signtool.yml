@@ -3,7 +3,7 @@ stages:
 
 sign_windows:
   stage: sign
-  image: docker.io/venafi/code-signing:latest-windows
+  image: docker.io/venafi/code-signing:latest-windows@sha256:f1df4b3a1132c3de0ca9df68fd697cd6f6bea2f0ca31d8ca164f5a75296334ae
   tags:
     - windows
   script:
